@@ -1,27 +1,26 @@
 {
 	"schemaVersion": 1,
-	"id": "chest-log",
+	"id": "chest-logs",
 	"version": "${version}",
-	"name": "Chest Log",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"name": "Chest Logs",
+	"description": "Log all chests on your server to catch the thieves",
 	"authors": [
-		"Me!"
+		"Aguga2201"
 	],
 	"contact": {
-		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
+		"homepage": "https://github.com/Aguga2201/ChestLog",
+		"sources": "https://github.com/Aguga2201/ChestLog",
+		"issues": "https://github.com/Aguga2201/ChestLog/issues"
 	},
-	"license": "CC0-1.0",
+	"license": "MIT",
 	"icon": "assets/chest-log/icon.png",
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"com.aguga.ChestLog"
+          "com.aguga.ChestLogs"
 		]
 	},
-	"mixins": [
-		"chest-log.mixins.json"
-	],
+	"mixins": [],
 	"depends": {
 		"fabricloader": ">=0.15.10",
 		"minecraft": "~1.20.4",

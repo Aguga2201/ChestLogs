@@ -1,6 +1,6 @@
 package com.aguga.Utils;
 
-import com.aguga.ChestLog;
+import com.aguga.ChestLogs;
 import net.minecraft.block.entity.*;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.RegistryKey;
@@ -108,7 +108,7 @@ public class Utils
             fileWriter.close();
         } catch (IOException e)
         {
-            ChestLog.LOGGER.error("Error writing log");
+            ChestLogs.LOGGER.error("Error writing log");
             e.printStackTrace();
         }
     }

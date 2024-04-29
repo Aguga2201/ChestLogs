@@ -21,7 +21,7 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class ChestLog implements ModInitializer
+public class ChestLogs implements ModInitializer
 {
     public static final Logger LOGGER = LoggerFactory.getLogger("chest-log");
 	String folderPath;
