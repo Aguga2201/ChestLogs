@@ -55,7 +55,7 @@ public class ChestLogs implements ModInitializer
 			BlockPos pos = hitResult.getBlockPos();
 
 			AtomicReference<String> timeStamp = new AtomicReference<>(Utils.getTimeStamp());
-			String dimStr = Utils.getDimString(world.getDimensionKey());
+			String dimStr = Utils.getDimString(world.getDimensionEntry());
 
 			String savePath = folderPath + File.separator + blockstr + " " + pos.getX() + " " + pos.getY() + " " + pos.getZ() + " " + dimStr;
 
