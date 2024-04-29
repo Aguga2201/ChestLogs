@@ -4,9 +4,11 @@ import com.aguga.ChestLogs;
 import net.minecraft.block.entity.*;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.dimension.DimensionTypes;
 
+import java.awt.*;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -24,15 +26,15 @@ public class Utils
         return String.format("[%s]", dtf.format(LocalDateTime.now()));
     }
 
-    public static String getDimString(RegistryKey<DimensionType> dimensionType)
+    public static String getDimString(RegistryEntry<DimensionType> dimensionTypeRegistryEntry)
     {
         String dimStr = "unkown";
-        if(dimensionType == DimensionTypes.OVERWORLD)
+        if(dimensionTypeRegistryEntry.getKey().equals(DimensionTypes.OVERWORLD))
             dimStr = "Overworld";
-        else if (dimensionType == DimensionTypes.THE_NETHER)
+        else if(dimensionTypeRegistryEntry.getKey().equals(DimensionTypes.THE_NETHER))
             dimStr = "Nether";
-        else if (dimensionType == DimensionTypes.THE_END)
-            dimStr = "The End";
+        else if(dimensionTypeRegistryEntry.getKey().equals(DimensionTypes.THE_END))
+            dimStr = "End";
         return dimStr;
     }
 
