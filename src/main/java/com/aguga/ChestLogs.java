@@ -24,21 +24,27 @@ import java.util.concurrent.atomic.AtomicReference;
 public class ChestLogs implements ModInitializer
 {
     public static final Logger LOGGER = LoggerFactory.getLogger("chest-log");
-	String folderPath;
+	List<String> folderPaths = new ArrayList<>();
 
 	@Override
 	public void onInitialize()
 	{
 		ServerLifecycleEvents.SERVER_STARTED.register((server ->
 		{
-			folderPath = server.getSavePath(WorldSavePath.ROOT).resolve("ChestLog").toString();
-			File folder = new File(folderPath);
+			folderPaths.add(server.getSavePath(WorldSavePath.ROOT).resolve("ChestLog").toString());
+			folderPaths.add(server.getSavePath(WorldSavePath.ROOT).resolve("ChestLog" + File.separator + "Overworld").toString());
+			folderPaths.add(server.getSavePath(WorldSavePath.ROOT).resolve("ChestLog" + File.separator + "The Nether").toString());
+			folderPaths.add(server.getSavePath(WorldSavePath.ROOT).resolve("ChestLog" + File.separator + "The End").toString());
 
-			if (!folder.exists())
+			for(String folderPath : folderPaths)
 			{
-				boolean created = folder.mkdirs();
-				if (!created)
-					LOGGER.error("Failed to create folder: " + folderPath);
+				File folder = new File(folderPath);
+
+				if (!folder.exists()) {
+					boolean created = folder.mkdirs();
+					if (!created)
+						LOGGER.error("Failed to create folder: " + folderPath);
+				}
 			}
 		}));
 
@@ -55,9 +61,9 @@ public class ChestLogs implements ModInitializer
 			BlockPos pos = hitResult.getBlockPos();
 
 			AtomicReference<String> timeStamp = new AtomicReference<>(Utils.getTimeStamp());
-			String dimStr = Utils.getDimString(world.getDimensionKey());
+			String dimStr = Utils.getDimString(world.getDimensionEntry());
 
-			String savePath = folderPath + File.separator + blockstr + " " + pos.getX() + " " + pos.getY() + " " + pos.getZ() + " " + dimStr;
+			String savePath = folderPaths.get(0) + File.separator + dimStr + File.separator + blockstr + " " + pos.getX() + " " + pos.getY() + " " + pos.getZ();
 
 			List<ItemStack> itemsBefore = List.copyOf(Utils.getItems(blockEntity));
 			List<String> itemsBeforeStr = Utils.itemStackListToStrList(itemsBefore);
