@@ -40,59 +40,18 @@ public class Utils
     public static List<ItemStack> getItems(BlockEntity blockEntity)
     {
         List<ItemStack> itemStacks = new ArrayList<>();
-
-        if(blockEntity instanceof ChestBlockEntity)
+        if(blockEntity instanceof LootableContainerBlockEntity)
         {
-            ChestBlockEntity chestEntity = (ChestBlockEntity) blockEntity;
-            for(int i = 0; i < chestEntity.size(); i++)
+            LootableContainerBlockEntity containerBlockEntity = (LootableContainerBlockEntity) blockEntity;
+            for(int i = 0; i < containerBlockEntity.size(); i++)
             {
-                ItemStack itemStack = chestEntity.getStack(i);
+                ItemStack itemStack = containerBlockEntity.getStack(i);
                 if(!itemStack.isEmpty())
                 {
                     itemStacks.add(itemStack);
                 }
             }
         }
-
-        if(blockEntity instanceof BarrelBlockEntity)
-        {
-            BarrelBlockEntity barrelEntity = (BarrelBlockEntity) blockEntity;
-            for(int i = 0; i < barrelEntity.size(); i++)
-            {
-                ItemStack itemStack = barrelEntity.getStack(i);
-                if(!itemStack.isEmpty())
-                {
-                    itemStacks.add(itemStack);
-                }
-            }
-        }
-
-        if(blockEntity instanceof ShulkerBoxBlockEntity)
-        {
-            ShulkerBoxBlockEntity shulkerBoxBlockEntity = (ShulkerBoxBlockEntity) blockEntity;
-            for(int i = 0; i < shulkerBoxBlockEntity.size(); i++)
-            {
-                ItemStack itemStack = shulkerBoxBlockEntity.getStack(i);
-                if(!itemStack.isEmpty())
-                {
-                    itemStacks.add(itemStack);
-                }
-            }
-        }
-
-        if(blockEntity instanceof TrappedChestBlockEntity)
-        {
-            TrappedChestBlockEntity trappedChestBlockEntity = (TrappedChestBlockEntity) blockEntity;
-            for(int i = 0; i < trappedChestBlockEntity.size(); i++)
-            {
-                ItemStack itemStack = trappedChestBlockEntity.getStack(i);
-                if(!itemStack.isEmpty())
-                {
-                    itemStacks.add(itemStack);
-                }
-            }
-        }
-
         return itemStacks;
     }
 
