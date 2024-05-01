@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "package": "com.aguga.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "BarrelBlockEntityMixin",
+    "ChestBlockEntityMixin",
+    "ShulkerBoxBlockEntityMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

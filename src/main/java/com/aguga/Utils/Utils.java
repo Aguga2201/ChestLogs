@@ -1,10 +1,21 @@
 package com.aguga.Utils;
 
 import com.aguga.ChestLogs;
+import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.ChestBlock;
+import net.minecraft.block.FacingBlock;
 import net.minecraft.block.entity.*;
+import net.minecraft.block.enums.ChestType;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.state.property.Properties;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
+import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.dimension.DimensionTypes;
 
@@ -37,19 +48,51 @@ public class Utils
         return dimStr;
     }
 
-    public static List<ItemStack> getItems(BlockEntity blockEntity)
+    public static ChestBlockEntity getSecondChest(BlockState blockState, BlockEntity blockEntity, World world)
+    {
+        if(!(blockEntity instanceof ChestBlockEntity))
+            return null;
+
+        ChestBlockEntity chestBlockEntity;
+        Direction facingDirection = blockState.get(Properties.HORIZONTAL_FACING);
+
+        if(blockState.get(ChestBlock.CHEST_TYPE) == ChestType.LEFT)
+        {
+            if(facingDirection.equals(Direction.EAST))
+                chestBlockEntity = (ChestBlockEntity) world.getBlockEntity(blockEntity.getPos().south());
+            else if(facingDirection.equals(Direction.SOUTH))
+                chestBlockEntity = (ChestBlockEntity) world.getBlockEntity(blockEntity.getPos().west());
+            else if(facingDirection.equals(Direction.WEST))
+                chestBlockEntity = (ChestBlockEntity) world.getBlockEntity(blockEntity.getPos().north());
+            else
+                chestBlockEntity = (ChestBlockEntity) world.getBlockEntity(blockEntity.getPos().east());
+        } else if(blockState.get(ChestBlock.CHEST_TYPE) == ChestType.RIGHT)
+        {
+            if(facingDirection.equals(Direction.EAST))
+                chestBlockEntity = (ChestBlockEntity) world.getBlockEntity(blockEntity.getPos().north());
+            else if(facingDirection.equals(Direction.SOUTH))
+                chestBlockEntity = (ChestBlockEntity) world.getBlockEntity(blockEntity.getPos().east());
+            else if(facingDirection.equals(Direction.WEST))
+                chestBlockEntity = (ChestBlockEntity) world.getBlockEntity(blockEntity.getPos().south());
+            else
+                chestBlockEntity = (ChestBlockEntity) world.getBlockEntity(blockEntity.getPos().west());
+        } else
+        {
+            chestBlockEntity = null;
+        }
+        return chestBlockEntity;
+    }
+
+    public static List<ItemStack> getItems(LootableContainerBlockEntity blockEntity)
     {
         List<ItemStack> itemStacks = new ArrayList<>();
-        if(blockEntity instanceof LootableContainerBlockEntity)
+
+        for(int i = 0; i < blockEntity.size(); i++)
         {
-            LootableContainerBlockEntity containerBlockEntity = (LootableContainerBlockEntity) blockEntity;
-            for(int i = 0; i < containerBlockEntity.size(); i++)
+            ItemStack itemStack = blockEntity.getStack(i);
+            if(!itemStack.isEmpty())
             {
-                ItemStack itemStack = containerBlockEntity.getStack(i);
-                if(!itemStack.isEmpty())
-                {
-                    itemStacks.add(itemStack);
-                }
+                itemStacks.add(itemStack);
             }
         }
         return itemStacks;

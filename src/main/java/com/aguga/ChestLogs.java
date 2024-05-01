@@ -1,18 +1,22 @@
 package com.aguga;
 
+import com.aguga.Utils.ChestClosedCallback;
 import com.aguga.Utils.Utils;
 import net.fabricmc.api.ModInitializer;
 
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.ChestBlockEntity;
+import net.minecraft.block.entity.LootableContainerBlockEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.WorldSavePath;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Direction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,6 +27,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class ChestLogs implements ModInitializer
 {
+	public static String chestClosedBy = "";
     public static final Logger LOGGER = LoggerFactory.getLogger("chest-log");
 	List<String> folderPaths = new ArrayList<>();
 
@@ -50,66 +55,56 @@ public class ChestLogs implements ModInitializer
 
 		UseBlockCallback.EVENT.register((player, world, hand, hitResult) ->
 		{
-			Block block = world.getBlockState(hitResult.getBlockPos()).getBlock();
-			BlockEntity blockEntity = world.getBlockEntity(hitResult.getBlockPos());
+			chestClosedBy = "";
+			BlockPos blockPos = hitResult.getBlockPos();
+			BlockState blockState = world.getBlockState(blockPos);
+			Block block = blockState.getBlock();
+			BlockEntity blockEntity = world.getBlockEntity(blockPos);
+			ChestBlockEntity secondChest = Utils.getSecondChest(blockState, blockEntity, world);
 
 			List<Block> chestBlocks = Arrays.asList(Blocks.CHEST, Blocks.TRAPPED_CHEST, Blocks.BARREL, Blocks.SHULKER_BOX);
 			if(!chestBlocks.contains(block))
 				return ActionResult.PASS;
 
 			String blockstr = block.getName().getString();
-			BlockPos pos = hitResult.getBlockPos();
 
 			AtomicReference<String> timeStamp = new AtomicReference<>(Utils.getTimeStamp());
 			String dimStr = Utils.getDimString(world.getDimensionEntry());
 
-			String savePath = folderPaths.get(0) + File.separator + dimStr + File.separator + blockstr + " " + pos.getX() + " " + pos.getY() + " " + pos.getZ();
+			String savePath = folderPaths.get(0) + File.separator + dimStr + File.separator + blockstr + " " + blockPos.getX() + " " + blockPos.getY() + " " + blockPos.getZ();
 
-			List<ItemStack> itemsBefore = List.copyOf(Utils.getItems(blockEntity));
+			List<ItemStack> itemsBefore = Utils.getItems((LootableContainerBlockEntity) blockEntity);
+			if(secondChest != null)
+				itemsBefore.addAll(Utils.getItems(secondChest));
 			List<String> itemsBeforeStr = Utils.itemStackListToStrList(itemsBefore);
 
-			CompletableFuture<Void> chestClosed = CompletableFuture.runAsync(() ->
+			CompletableFuture<Void> future = CompletableFuture.runAsync(() ->
 			{
-				try
+				while(!chestClosedBy.equals(player.getName().toString()))
 				{
-					Thread.sleep(2000);
-				} catch (InterruptedException e)
-				{
-					e.printStackTrace();
+
 				}
 
-				Vec3d initialPos = player.getPos();
-				Float initialYaw = player.getYaw();
-				Float initialPitch = player.getPitch();
-
-				Float currentYaw = player.getYaw();
-				Float currentPitch = player.getPitch();
-				Vec3d currentPos = player.getPos();
-
-				while(initialYaw.equals(currentYaw) && initialPitch.equals(currentPitch) && initialPos.equals(currentPos))
-				{
-					try
-					{
-						Thread.sleep(400);
-					} catch (InterruptedException e)
-					{
-						e.printStackTrace();
-					}
-					currentPos = player.getPos();
-					currentYaw = player.getYaw();
-					currentPitch = player.getPitch();
-				}
-
-				List<ItemStack> itemsAfter = Utils.getItems(blockEntity);
+				List<ItemStack> itemsAfter = Utils.getItems((LootableContainerBlockEntity) blockEntity);
+				if(secondChest != null)
+					itemsAfter.addAll(Utils.getItems(secondChest));
 				List<String> itemsAfterStr = Utils.itemStackListToStrList(itemsAfter);
 				timeStamp.set(Utils.getTimeStamp());
 
 				List<String> itemsAdded = Utils.getChangedItems(itemsBeforeStr, itemsAfterStr);
 				List<String> itemsRemoved = Utils.getChangedItems(itemsAfterStr, itemsBeforeStr);
 
+				//LOGGER.info("Items Added: " + itemsAdded);
+				//LOGGER.info("Items Removed: " + itemsRemoved);
+
 				Utils.writeLog(timeStamp.get(), player.getDisplayName().getString(), savePath, itemsAdded, itemsRemoved);
 			});
 			return ActionResult.PASS;
 		});
+
+		ChestClosedCallback.EVENT.register((player ->
+		{
+			chestClosedBy = player.getName().toString();
+		}));
 	}
 }
