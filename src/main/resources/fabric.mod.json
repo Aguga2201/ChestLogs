@@ -21,11 +21,7 @@
 		]
 	},
 	"mixins": [
-		"chest-logs.mixins.json",
-		{
-			"config": "chest-logs.mixins.json",
-			"environment": "client"
-		}
+		"chest-logs.mixins.json"
 	],
 	"depends": {
 		"fabricloader": ">=0.15.10",
