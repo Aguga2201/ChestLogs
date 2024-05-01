@@ -1,3 +1,5 @@
+[![modrinth](https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy/available/modrinth_vector.svg)](https://modrinth.com/mod/chest-logs)
+---
 **Is someone on your server stealing? Catch them with Chest Logs!** <br><br>
 **Chest Logs** creates a separate log file for every Chest/Barrel/Shulker on your server and stores it inside your World folder. <br> <br>
 **What this mod logs:**
