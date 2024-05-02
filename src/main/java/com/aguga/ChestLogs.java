@@ -16,7 +16,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.WorldSavePath;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,10 +67,9 @@ public class ChestLogs implements ModInitializer
 
 			String blockstr = block.getName().getString();
 
-			AtomicReference<String> timeStamp = new AtomicReference<>(Utils.getTimeStamp());
 			String dimStr = Utils.getDimString(world.getDimensionEntry());
 
-			String savePath = folderPaths.get(0) + File.separator + dimStr + File.separator + blockstr + " " + blockPos.getX() + " " + blockPos.getY() + " " + blockPos.getZ();
+			AtomicReference<String> savePath = new AtomicReference<>(folderPaths.get(0) + File.separator + dimStr + File.separator + blockstr + " " + blockPos.getX() + " " + blockPos.getY() + " " + blockPos.getZ());
 
 			List<ItemStack> itemsBefore = Utils.getItems((LootableContainerBlockEntity) blockEntity);
 			if(secondChest != null)
@@ -89,7 +87,7 @@ public class ChestLogs implements ModInitializer
 				if(secondChest != null)
 					itemsAfter.addAll(Utils.getItems(secondChest));
 				List<String> itemsAfterStr = Utils.itemStackListToStrList(itemsAfter);
-				timeStamp.set(Utils.getTimeStamp());
+				String timeStamp = Utils.getTimeStamp();
 
 				List<String> itemsAdded = Utils.getChangedItems(itemsBeforeStr, itemsAfterStr);
 				List<String> itemsRemoved = Utils.getChangedItems(itemsAfterStr, itemsBeforeStr);
@@ -97,7 +95,14 @@ public class ChestLogs implements ModInitializer
 				//LOGGER.info("Items Added: " + itemsAdded);
 				//LOGGER.info("Items Removed: " + itemsRemoved);
 
-				Utils.writeLog(timeStamp.get(), player.getDisplayName().getString(), savePath, itemsAdded, itemsRemoved);
+				if(!itemsAdded.isEmpty() || !itemsRemoved.isEmpty())
+				{
+					Utils.writeLog(timeStamp, player.getName().getString(), savePath.get(), itemsAdded, itemsRemoved);
+					if (secondChest != null) {
+						savePath.set(folderPaths.get(0) + File.separator + dimStr + File.separator + blockstr + " " + secondChest.getPos().getX() + " " + secondChest.getPos().getY() + " " + secondChest.getPos().getZ());
+						Utils.writeLog(timeStamp, player.getName().getString(), savePath.get(), itemsAdded, itemsRemoved);
+					}
+				}
 			});
 			return ActionResult.PASS;
 		});
