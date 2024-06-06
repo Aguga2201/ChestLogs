@@ -10,9 +10,10 @@ public interface ChestClosedCallback
     void invoke(PlayerEntity player);
 
     Event<ChestClosedCallback> EVENT = EventFactory.createArrayBacked(ChestClosedCallback.class,
-            (listeners) -> (player) -> {
-                for (ChestClosedCallback listener : listeners) {
-                    // Invoke all event listeners with the provided player and death message.
+            (listeners) -> (player) ->
+            {
+                for (ChestClosedCallback listener : listeners)
+                {
                     listener.invoke(player);
                 }
             });

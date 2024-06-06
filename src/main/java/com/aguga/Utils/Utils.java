@@ -1,19 +1,13 @@
 package com.aguga.Utils;
 
 import com.aguga.ChestLogs;
-import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.ChestBlock;
-import net.minecraft.block.FacingBlock;
 import net.minecraft.block.entity.*;
 import net.minecraft.block.enums.ChestType;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.item.ItemStack;
-import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.state.property.Properties;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
@@ -24,9 +18,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class Utils
 {
@@ -50,37 +42,25 @@ public class Utils
 
     public static ChestBlockEntity getSecondChest(BlockState blockState, BlockEntity blockEntity, World world)
     {
-        if(!(blockEntity instanceof ChestBlockEntity))
-            return null;
-
-        ChestBlockEntity chestBlockEntity;
+        if (!(blockEntity instanceof ChestBlockEntity)) return null;
         Direction facingDirection = blockState.get(Properties.HORIZONTAL_FACING);
 
-        if(blockState.get(ChestBlock.CHEST_TYPE) == ChestType.LEFT)
+        ChestType chestType = blockState.get(ChestBlock.CHEST_TYPE);
+        switch (chestType)
         {
-            if(facingDirection.equals(Direction.EAST))
-                chestBlockEntity = (ChestBlockEntity) world.getBlockEntity(blockEntity.getPos().south());
-            else if(facingDirection.equals(Direction.SOUTH))
-                chestBlockEntity = (ChestBlockEntity) world.getBlockEntity(blockEntity.getPos().west());
-            else if(facingDirection.equals(Direction.WEST))
-                chestBlockEntity = (ChestBlockEntity) world.getBlockEntity(blockEntity.getPos().north());
-            else
-                chestBlockEntity = (ChestBlockEntity) world.getBlockEntity(blockEntity.getPos().east());
-        } else if(blockState.get(ChestBlock.CHEST_TYPE) == ChestType.RIGHT)
-        {
-            if(facingDirection.equals(Direction.EAST))
-                chestBlockEntity = (ChestBlockEntity) world.getBlockEntity(blockEntity.getPos().north());
-            else if(facingDirection.equals(Direction.SOUTH))
-                chestBlockEntity = (ChestBlockEntity) world.getBlockEntity(blockEntity.getPos().east());
-            else if(facingDirection.equals(Direction.WEST))
-                chestBlockEntity = (ChestBlockEntity) world.getBlockEntity(blockEntity.getPos().south());
-            else
-                chestBlockEntity = (ChestBlockEntity) world.getBlockEntity(blockEntity.getPos().west());
-        } else
-        {
-            chestBlockEntity = null;
+            case LEFT:
+                if (facingDirection == Direction.EAST) return (ChestBlockEntity) world.getBlockEntity(blockEntity.getPos().south());
+                else if (facingDirection == Direction.SOUTH) return (ChestBlockEntity) world.getBlockEntity(blockEntity.getPos().west());
+                else if (facingDirection == Direction.WEST) return (ChestBlockEntity) world.getBlockEntity(blockEntity.getPos().north());
+                else return (ChestBlockEntity) world.getBlockEntity(blockEntity.getPos().east());
+            case RIGHT:
+                if (facingDirection == Direction.EAST) return (ChestBlockEntity) world.getBlockEntity(blockEntity.getPos().north());
+                else if (facingDirection == Direction.SOUTH) return (ChestBlockEntity) world.getBlockEntity(blockEntity.getPos().east());
+                else if (facingDirection == Direction.WEST) return (ChestBlockEntity) world.getBlockEntity(blockEntity.getPos().south());
+                else return (ChestBlockEntity) world.getBlockEntity(blockEntity.getPos().west());
+            default:
+                return null;
         }
-        return chestBlockEntity;
     }
 
     public static List<ItemStack> getItems(LootableContainerBlockEntity blockEntity)
@@ -106,7 +86,7 @@ public class Utils
 
             logStr = timeStamp + " " + playerName + "\nItems Added: " + itemsAdded + "\nItems Removed: " + itemsRemoved + "\n\n";
 
-            FileWriter fileWriter = new FileWriter(new File(path), true);
+            FileWriter fileWriter = new FileWriter(path, true);
             fileWriter.write(logStr);
             fileWriter.close();
         } catch (IOException e)
@@ -119,10 +99,11 @@ public class Utils
     public static List<String> itemStackListToStrList(List<ItemStack> items)
     {
         String itemsStr = items.toString();
-        List<String> itemsList = Arrays.asList(itemsStr.substring(1, itemsStr.length() - 1).split(","));
+        String[] itemsList = itemsStr.substring(1, itemsStr.length() - 1).split(",");
         List<String> outputList = new ArrayList<>();
 
-        for (String item : itemsList) {
+        for (String item : itemsList)
+        {
             if(item.isEmpty()) continue;
 
             String[] parts = item.trim().split(" ");
@@ -138,44 +119,41 @@ public class Utils
 
     public static List<String> getChangedItems(List<String> list1, List<String> list2)
     {
-        List<String> outputList = new ArrayList<>();
-        List<String> done = new ArrayList<>();
+        Map<String, Integer> countMap1 = new HashMap<>();
+        Map<String, Integer> countMap2 = new HashMap<>();
 
-        Integer count;
-        Integer count1;
-        Integer count2;
-
-        for(String item : list2)
+        // Count occurrences in list1
+        for (String item : list1)
         {
-            if(done.contains(item.split(" ", 2)[1]))
-                continue;
-
-            count = 0;
-            count1 = 0;
-            count2 = 0;
-            for(String str : list2)
-            {
-                if(str.split(" ", 2)[1].equals(item.split(" ", 2)[1]))
-                {
-                    count1 += Integer.parseInt(str.split(" ")[0]);
-                }
-            }
-
-            for(String str : list1)
-            {
-                if(str.split(" ", 2)[1].equals(item.split(" ", 2)[1]))
-                {
-                    count2 += Integer.parseInt(str.split(" ")[0]);
-                }
-            }
-
-            count = count1 - count2;
-            if(count > 0)
-            {
-                outputList.add(outputList.size(), count + " " + item.split(" ", 2)[1]);
-            }
-            done.add(item.split(" ", 2)[1]);
+            String[] parts = item.split(" ", 2);
+            int count = Integer.parseInt(parts[0]);
+            String name = parts[1];
+            countMap1.put(name, countMap1.getOrDefault(name, 0) + count);
         }
+
+        // Count occurrences in list2
+        for (String item : list2)
+        {
+            String[] parts = item.split(" ", 2);
+            int count = Integer.parseInt(parts[0]);
+            String name = parts[1];
+            countMap2.put(name, countMap2.getOrDefault(name, 0) + count);
+        }
+
+        List<String> outputList = new ArrayList<>();
+
+        // Calculate the differences
+        for (Map.Entry<String, Integer> entry : countMap2.entrySet())
+        {
+            String name = entry.getKey();
+            int count2 = entry.getValue();
+            int count1 = countMap1.getOrDefault(name, 0);
+            int countDiff = count2 - count1;
+            if (countDiff > 0) {
+                outputList.add(countDiff + " " + name);
+            }
+        }
+
         return outputList;
     }
 }
