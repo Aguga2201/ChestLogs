@@ -95,6 +95,23 @@ public class Utils
         }
     }
 
+    public static void writeMessageLog(String timeStamp, String playerName, String path, String message)
+    {
+        try
+        {
+            String logStr;
+
+            logStr = timeStamp + " " + playerName + "\n" + message + "\n\n";
+
+            FileWriter fileWriter = new FileWriter(path, true);
+            fileWriter.write(logStr);
+            fileWriter.close();
+        } catch (IOException e) {
+            ChestLogs.LOGGER.error("Error writing log");
+            e.printStackTrace();
+        }
+    }
+
     public static List<String> itemStackListToStrList(List<ItemStack> items)
     {
         String itemsStr = items.toString();

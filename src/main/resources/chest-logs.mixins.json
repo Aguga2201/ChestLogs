@@ -5,7 +5,8 @@
   "mixins": [
     "BarrelBlockEntityMixin",
     "ChestBlockEntityMixin",
-    "ShulkerBoxBlockEntityMixin"
+    "ShulkerBoxBlockEntityMixin",
+    "PlayerPlaceBlock"
   ],
   "injectors": {
     "defaultRequire": 1
