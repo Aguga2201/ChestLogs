@@ -97,8 +97,8 @@ public class ChestLogs implements ModInitializer
 				List<String> itemsAdded = Utils.getChangedItems(itemsBeforeStr, itemsAfterStr);
 				List<String> itemsRemoved = Utils.getChangedItems(itemsAfterStr, itemsBeforeStr);
 
-				LOGGER.info("Items Added: " + itemsAdded);
-				LOGGER.info("Items Removed: " + itemsRemoved);
+				//LOGGER.info("Items Added: " + itemsAdded);
+				//LOGGER.info("Items Removed: " + itemsRemoved);
 
 				if(!itemsAdded.isEmpty() || !itemsRemoved.isEmpty())
 				{
@@ -148,11 +148,11 @@ public class ChestLogs implements ModInitializer
 				String dimStr = Utils.getDimString(world.getDimensionEntry());
 				String savePath = folderPaths.get(0) + File.separator + dimStr + File.separator + blockstr + " " + chestPos.getX() + " " + chestPos.getY() + " " + chestPos.getZ();
 
-				Utils.writeMessageLog(Utils.getTimeStamp(), context.getPlayer().getName().getString(), savePath, "Placed Hopper underneath chest");
+				Utils.writeMessageLog(Utils.getTimeStamp(), context.getPlayer().getName().getString(), savePath, "Placed Hopper underneath container");
 				if(secondChest != null)
 				{
 					savePath = folderPaths.get(0) + File.separator + dimStr + File.separator + blockstr + " " + secondChest.getPos().getX() + " " + secondChest.getPos().getY() + " " + secondChest.getPos().getZ();
-					Utils.writeMessageLog(Utils.getTimeStamp(), context.getPlayer().getName().getString(), savePath, "Placed Hopper underneath chest");
+					Utils.writeMessageLog(Utils.getTimeStamp(), context.getPlayer().getName().getString(), savePath, "Placed Hopper underneath container");
 				}
 			}
 		}));
