@@ -81,9 +81,16 @@ public class ChestLogs implements ModInitializer
 
 			CompletableFuture<Void> future = CompletableFuture.runAsync(() ->
 			{
-				while(!chestClosedBy.equals(player.getName().toString()))
+				while (!chestClosedBy.equals(player.getName().toString()))
 				{
-
+					try
+					{
+						Thread.sleep(100);
+					} catch (InterruptedException e)
+					{
+						Thread.currentThread().interrupt();
+						LOGGER.error("Thread interrupted while waiting for chest to close", e);
+					}
 				}
 
 				List<ItemStack> itemsAfter = Utils.getItems((LootableContainerBlockEntity) blockEntity);
