@@ -32,7 +32,6 @@ public class ChestLogs implements ModInitializer
 	public static String chestClosedBy = "";
     public static final Logger LOGGER = LoggerFactory.getLogger("chest-log");
 	List<String> folderPaths = new ArrayList<>();
-	List<Block> chestBlocks = Arrays.asList(Blocks.CHEST, Blocks.TRAPPED_CHEST, Blocks.BARREL, Blocks.SHULKER_BOX);
 
 	@Override
 	public void onInitialize()
@@ -65,7 +64,7 @@ public class ChestLogs implements ModInitializer
 			BlockEntity blockEntity = world.getBlockEntity(blockPos);
 			ChestBlockEntity secondChest = Utils.getSecondChest(blockState, blockEntity, world);
 
-			if(!chestBlocks.contains(block))
+			if(!(blockEntity instanceof LootableContainerBlockEntity))
 				return ActionResult.PASS;
 
 			String blockstr = block.getName().getString();
@@ -125,14 +124,14 @@ public class ChestLogs implements ModInitializer
 		PlayerBlockBreakEvents.BEFORE.register((world, player, blockPos, blockState, blockEntity) ->
 		{
 			Block block = blockState.getBlock();
-			if(!chestBlocks.contains(block))
+			if(!(blockEntity instanceof LootableContainerBlockEntity))
 				return true;
 
 			String blockstr = block.getName().getString();
 			String dimStr = Utils.getDimString(world.getDimensionEntry());
 			String savePath = folderPaths.get(0) + File.separator + dimStr + File.separator + blockstr + " " + blockPos.getX() + " " + blockPos.getY() + " " + blockPos.getZ();
 
-			Utils.writeMessageLog(Utils.getTimeStamp(), player.getName().getString(), savePath, "Broke chest");
+			Utils.writeMessageLog(Utils.getTimeStamp(), player.getName().getString(), savePath, "Broke " + blockstr);
             return true;
         });
 
@@ -144,7 +143,7 @@ public class ChestLogs implements ModInitializer
 			if(blockState.getBlock() == Blocks.HOPPER)
 			{
 				BlockPos chestPos = blockPos.add(0, 1, 0);
-				if(!chestBlocks.contains(world.getBlockState(chestPos).getBlock()))
+				if(!(world.getBlockEntity(chestPos) instanceof LootableContainerBlockEntity))
 					return;
 				BlockState chestState = world.getBlockState(chestPos);
 				ChestBlockEntity secondChest = Utils.getSecondChest(chestState, world.getBlockEntity(chestPos), world);
